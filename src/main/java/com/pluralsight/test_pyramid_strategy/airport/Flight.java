@@ -1,5 +1,8 @@
 package com.pluralsight.test_pyramid_strategy.airport;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Flight {
 
 	private String flightNumber;
@@ -8,8 +11,16 @@ public class Flight {
 	private String origin;
     private String destination;
     private boolean flying;
+    private String flightNumberRegex = "^[A-Z]{2}\\d{3,4}$";
+    private Pattern pattern = Pattern.compile(flightNumberRegex);
+
 
 	public Flight(String flightNumber, int places) {
+	    Matcher matcher = pattern.matcher(flightNumber);
+	    if(!matcher.matches()) {
+	        throw new RuntimeException("Invalid flight number");
+        }
+
 		this.flightNumber = flightNumber;
 		this.places = places;
 		this.passengers = 0;
@@ -24,7 +35,11 @@ public class Flight {
         return places;
     }
 
-    public void setPlaces(int places) {
+    public void setPlaces(int places)
+    {
+        if (passengers > places) {
+            throw new RuntimeException("Too many passengers for this flight. Places cannot be reduced!");
+        }
         this.places = places;
     }
 
@@ -37,6 +52,9 @@ public class Flight {
     }
 
     public void setOrigin(String origin) {
+	    if(flying) {
+	        throw new RuntimeException("Flight cannot change its origin any longer!");
+        }
         this.origin = origin;
     }
 
@@ -58,6 +76,9 @@ public class Flight {
     }
 
     public void sellTicket() {
+	    if(passengers >= places) {
+	        throw new RuntimeException("Not enough places");
+        }
         System.out.println("Ticket for " + this + " sold");
         passengers++;
     }
